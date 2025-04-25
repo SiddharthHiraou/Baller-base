@@ -4,15 +4,14 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# DB Connection Details (Modify accordingly)
 conn = psycopg2.connect(
-    host="localhost",
-    database="NBA_Final",
-    user="postgres",  
-    password="6666"
+    host="db.hemlapemqvixbyhcdgv.supabase.co",
+    database="postgres",
+    user="postgres",
+    password="your_real_password_here", 
+    port="5432"
 )
 
-# Predefined Queries Dictionary
 predefined_queries = {
     "1": """SELECT gd.player_id, pd.player_name, t.nickname AS team, gd.pts, gd.game_id
             FROM gamedetails gd
@@ -27,30 +26,31 @@ predefined_queries = {
             GROUP BY gd.season, t.nickname
             ORDER BY gd.season;""",
     "3": """SELECT g.game_date_est, g.season, g.home_team_id, th.nickname AS home_team, rh.w AS home_wins, rh.l AS home_losses,
-                    g.visitor_team_id, tv.nickname AS visitor_team, rv.w AS visitor_wins, rv.l AS visitor_losses
-             FROM games g
-             JOIN teams th ON g.home_team_id = th.team_id
-             JOIN teams tv ON g.visitor_team_id = tv.team_id
-             JOIN ranking rh ON rh.team_id = g.home_team_id AND rh.standingsdate = g.game_date_est
-             JOIN ranking rv ON rv.team_id = g.visitor_team_id AND rv.standingsdate = g.game_date_est
-             WHERE ((g.home_team_id = 1610612747 AND g.visitor_team_id = 1610612738) OR (g.home_team_id = 1610612738 AND g.visitor_team_id = 1610612747))
-             ORDER BY g.game_date_est DESC
-             LIMIT 5;""",
+                   g.visitor_team_id, tv.nickname AS visitor_team, rv.w AS visitor_wins, rv.l AS visitor_losses
+            FROM games g
+            JOIN teams th ON g.home_team_id = th.team_id
+            JOIN teams tv ON g.visitor_team_id = tv.team_id
+            JOIN ranking rh ON rh.team_id = g.home_team_id AND rh.standingsdate = g.game_date_est
+            JOIN ranking rv ON rv.team_id = g.visitor_team_id AND rv.standingsdate = g.game_date_est
+            WHERE ((g.home_team_id = 1610612747 AND g.visitor_team_id = 1610612738)
+                   OR (g.home_team_id = 1610612738 AND g.visitor_team_id = 1610612747))
+            ORDER BY g.game_date_est DESC
+            LIMIT 5;""",
     "4": """SELECT g.season, g.home_team_id, t.nickname, COUNT(*) AS home_wins
-             FROM games g
-             JOIN teams t ON g.home_team_id = t.team_id
-             WHERE g.home_team_wins = TRUE
-             GROUP BY g.season, g.home_team_id, t.nickname
-             HAVING COUNT(*) = (
-                 SELECT MAX(wins)
-                 FROM (
-                     SELECT COUNT(*) AS wins
-                     FROM games
-                     WHERE home_team_wins = TRUE AND season = g.season
-                     GROUP BY home_team_id
-                 ) AS season_wins
-             )
-             ORDER BY g.season;""",
+            FROM games g
+            JOIN teams t ON g.home_team_id = t.team_id
+            WHERE g.home_team_wins = TRUE
+            GROUP BY g.season, g.home_team_id, t.nickname
+            HAVING COUNT(*) = (
+                SELECT MAX(wins)
+                FROM (
+                    SELECT COUNT(*) AS wins
+                    FROM games
+                    WHERE home_team_wins = TRUE AND season = g.season
+                    GROUP BY home_team_id
+                ) AS season_wins
+            )
+            ORDER BY g.season;""",
     "5": """SELECT pd.player_name, ROUND(AVG(gd.pts),2) AS player_avg,
                    (SELECT ROUND(AVG(pts),2) FROM gamedetails WHERE season=2017) AS season_avg
             FROM gamedetails gd
@@ -62,31 +62,28 @@ predefined_queries = {
             LIMIT 10;"""
 }
 
-
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
 
-
 @app.route("/predefined_query", methods=["POST"])
 def predefined_query():
-    query_id = request.form["predefined_query_id"]
+    query_id = request.form.get("predefined_query_id")
     query = predefined_queries.get(query_id)
     if query:
         try:
             df = pd.read_sql_query(query, conn)
-            result = df.to_html(classes="table table-striped", index=False)
+            result = df.to_html(classes="table table-bordered table-hover", index=False)
             return render_template("index.html", result=result, executed_query=query)
         except Exception as e:
             return render_template("index.html", error=str(e))
     else:
-        return render_template("index.html", error="❌ Invalid Predefined Query Selected")
-
+        return render_template("index.html", error="Invalid Predefined Query Selected")
 
 @app.route("/insert_data", methods=["POST"])
 def insert_data():
-    table = request.form["table"]
-    values = request.form["values"]
+    table = request.form.get("table")
+    values = request.form.get("values")
     query = f"INSERT INTO {table} VALUES ({values})"
     try:
         cur = conn.cursor()
@@ -99,4 +96,4 @@ def insert_data():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5050)
+    app.run(debug=True, port=5000)
