@@ -9,7 +9,7 @@ conn = psycopg2.connect(
     host="localhost",
     database="NBA_Final",
     user="postgres",  
-    password="6666" 
+    password="6666"
 )
 
 # Predefined Queries Dictionary
@@ -98,20 +98,5 @@ def insert_data():
         return render_template("index.html", error=str(e))
 
 
-@app.route("/predefined_query", methods=["POST"])
-def predefined_query():
-    query_id = request.form["predefined_query_id"]
-    query = predefined_queries.get(query_id)
-    if query:
-        try:
-            df = pd.read_sql_query(query, conn)
-            result = df.to_html(classes="table table-striped", index=False)
-            return render_template("index.html", result=result)
-        except Exception as e:
-            return render_template("index.html", error=str(e))
-    else:
-        return render_template("index.html", error="❌ Invalid Predefined Query Selected")
-
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5050)
