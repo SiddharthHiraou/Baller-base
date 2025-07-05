@@ -210,9 +210,9 @@ http://localhost:5000/
 
 ## 📌 ER Diagram
 
-> *(Include a visual of your ER diagram here)*
-> Example: `screenshots/er_diagram.png`
+The schema connects all six tables via primary/foreign keys and avoids redundancy while supporting flexible queries.
 
+![ER Diagram](./Screenshots/ER_diagram_final.png)
 
 ---
 
