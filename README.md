@@ -213,14 +213,6 @@ http://localhost:5000/
 > *(Include a visual of your ER diagram here)*
 > Example: `screenshots/er_diagram.png`
 
----
-
-## 🧑‍🤝‍🧑 Team
-
-| Name             | GitHub ID   |
-| ---------------- | ----------- |
-| Siddharth Hiraou | `@shiraou`  |
-| Om Nankar        | `@omnankar` |
 
 ---
 
