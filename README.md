@@ -218,7 +218,6 @@ The schema connects all six tables via primary/foreign keys and avoids redundanc
 
 ## 📂 Dataset Source
 
-🏀 [NBA Stats Kaggle Dataset (2003–2022)]([https://www.kaggle.com/datasets](https://www.kaggle.com/datasets/wyattowalsh/basketball))
-
+🏀 [Kaggle – Basketball (NBA Stats 2003–2022)](https://www.kaggle.com/datasets/wyattowalsh/basketball)
 ---
 
